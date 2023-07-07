@@ -75,6 +75,6 @@ class BinaryLCA():
         return ancestor1 == ancestor2
     
 if __name__ == "__main__":
-    file_name = "/media/bap/Storage/Code/IQ1/question/question3/hierarchycopy.txt"
+    file_name = "asset/hierarchycopy.txt"
     lca = BinaryLCA(file_name)
     import pdb; pdb.set_trace()

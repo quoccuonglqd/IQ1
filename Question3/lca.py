@@ -1,5 +1,75 @@
 from collections import defaultdict
 
+class SimpleLCA():
+    def __init__(self, file_name):
+        super().__init__()
+        self.file_name = file_name
+        with open(self.file_name, "r") as f:
+            self.data = f.read().split("\n")
+            self.data = [i.split(" ") for i in self.data]
+        
+        self.name_to_id = defaultdict(int)
+        self.id_to_name = defaultdict(str)
+        cnt = 1
+        for pair in self.data:
+            for name in pair:
+                if name not in self.name_to_id:
+                    self.name_to_id[name] = cnt
+                    self.id_to_name[str(cnt)] = name
+                    cnt += 1
+
+        self.N = cnt
+        self.sibling = defaultdict(list)
+        self.par = [0] * (self.N + 1)
+        self.anc = [0] * (self.N + 1)
+        self.vis = [False] * (self.N + 1)
+
+        for pair in self.data:
+            u = self.name_to_id[pair[0]]
+            v = self.name_to_id[pair[1]]
+            self.par[v] = u
+            self.sibling[u].append(v)
+            self.vis[v] = True
+
+        self.preprocess()
+
+    def preprocess(self):
+        def dfs(u):
+            for v in self.sibling[u]:
+                self.anc[v] = self.anc[u]
+                dfs(v)
+
+        for u in range(1, self.N + 1):
+            if not self.vis[u]:
+               self.anc[u] = u
+               dfs(u)
+    
+    def find_all_sibling(self, name):
+        u = self.name_to_id[name]
+        return self.id_to_name[str(self.sibling[u])]
+    
+    def find_parent(self, name):
+        u = self.name_to_id[name]
+        return self.id_to_name[str(self.par[u])]
+    
+    def find_all_ancestor(self, name):
+        u = self.name_to_id[name]
+        ans = []
+        u = self.par[u]
+        while u:
+            ans.append(self.id_to_name[str(u)])
+            u = self.par[u]
+        return ans
+    
+    def find_furthest_ancestor(self, name):
+        u = self.name_to_id[name]
+        return self.id_to_name[str(self.anc[u])]
+
+    def check_same_ancestor(self, name1, name2):
+        ancestor1 = self.find_furthest_ancestor(name1)
+        ancestor2 = self.find_furthest_ancestor(name2)
+        return ancestor1 == ancestor2
+
 class BinaryLCA():
     def __init__(self, file_name):
         super().__init__()
@@ -75,6 +145,6 @@ class BinaryLCA():
         return ancestor1 == ancestor2
     
 if __name__ == "__main__":
-    file_name = "asset/hierarchycopy.txt"
-    lca = BinaryLCA(file_name)
+    file_name = "D:/code/IQ1/Question3/asset/hierarchycopy.txt"
+    lca = SimpleLCA(file_name)
     import pdb; pdb.set_trace()
